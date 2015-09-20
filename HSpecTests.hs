@@ -9,13 +9,14 @@ import Data.Conduit.Network.UDP
 import Data.Conduit.List
 import Data.ByteString
 import Data.Word
-import Network.Socket.Internal
 import Control.Monad.Trans.Resource
 
 -- For removing the test file
 import System.Directory
 import Control.Exception
 import System.IO.Error
+
+import Network.Socket
 
 testReservoir :: IO ()
 testReservoir
@@ -25,10 +26,19 @@ testReservoir
         addr = SockAddrUnix "a unix addr"
 
 main :: IO ()
-main = hspec $ after_ (removeIfExists "test.out") $ do
-  describe "Reservoir" $ do
-    it "listens on a UDP socket" $ do
+main = hspec $ do
+  describe "writeLogs" $ after_ (removeIfExists "test.out") $ do
+    it "writes UDP messages to a log file" $ do
       testReservoir `shouldReturn` ()
+  describe "openUDPSocket" $ do
+    it "opens a UDP socket" $ do
+      checkSocket (openUDPSocket 60000) `shouldReturn` 60000
+
+checkSocket :: IO Socket -> IO PortNumber
+checkSocket skt = do
+  s <- skt
+  b <- socketPort s
+  return b
 
 removeIfExists :: FilePath -> IO ()
 removeIfExists fileName = removeFile fileName `catch` handleExists
