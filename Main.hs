@@ -4,7 +4,8 @@ module Main where
 
 import System.Environment
 import System.Exit
-import Data.ByteString
+import Data.ByteString hiding (snoc)
+import Data.ByteString.Char8 (snoc)
 import Data.Conduit
 import Data.Conduit.Binary
 import Data.Conduit.Network.UDP
@@ -34,7 +35,7 @@ writeLogs :: Producer (ResourceT IO) Message -> String -> IO ()
 writeLogs s o = runResourceT $ (mapOutput transformPkts s) $$ sinkFile o
 
 transformPkts :: Message -> ByteString
-transformPkts (Message b _) = b
+transformPkts (Message b _) = snoc b '\n'
 
 openUDPSocket :: PortNumber -> IO Socket
 openUDPSocket port = do
