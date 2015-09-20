@@ -1,8 +1,8 @@
 {-# LANGUAGE Rank2Types #-}
 
-module Main where
+module HSpecTests where
 
-import Reservoir
+import Main
 import Test.Hspec
 import Data.Conduit
 import Data.Conduit.Network.UDP
